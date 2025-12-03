@@ -50,6 +50,8 @@ void solveExpression(int var_count, const string expression_name, const function
     cout << "=============================================\n";
     if (is_tautology)
         cout << "| " << expression_name << " IS a TAUTOLOGY.\n";
+    else
+        cout << "| " << expression_name << " IS NOT a TAUTOLOGY.\n";
     cout << "=============================================";
 }
 
