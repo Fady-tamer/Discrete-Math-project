@@ -37,8 +37,8 @@ void solveExpression(int var_count, const string expression_name, const function
     cout << "=============================================\n";
     for (int i = 0; i < num_rows; ++i)
     {
-        bool A = (i / (1 << (var_count - 1))) % 2 == 1;
-        bool B = (var_count >= 2) ? ((i / (1 << (var_count - 2))) % 2 == 1) : false;
+        bool A = (i / 2) % 2 == 1;
+        bool B = i % 2 == 1;
 
         bool result = expression(A, B);
         if (result == false)
