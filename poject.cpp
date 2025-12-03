@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include <functional>
 
 using namespace std;
@@ -22,29 +23,39 @@ bool Implication(bool p, bool q) { return Negation(p) || q; }
 // function to print 'T' for true and 'F' for false
 string print_bool(bool val) { return val ? "T" : "F"; }
 
-void solveExpression(int var_count, const string expression_name, const function<bool(bool, bool)> expression)
+void solveExpression(int var_count, const string expression_name, const function<bool(bool, bool, bool)> expression)
 {
-    int num_rows = var_count * var_count;
+    int num_rows = pow(2, var_count);
     cout << "=============================================\n";
     cout << "| Expression: " << expression_name << " is it TAUTOLOGY |" << "\n";
     cout << "=============================================\n";
-    cout << "| A | B | (B -> A) | A -> (B -> A)\n";
+    if (var_count == 2)
+        cout << "| A | B |  B -> A  | " << expression_name << " |\n";
+    else
+        cout << "| A | B | C |  B -> C  | " << expression_name << " |\n";
     bool is_tautology = true;
     cout << "=============================================\n";
     for (int i = num_rows - 1; i >= 0; i--)
     {
-        bool A = (i / 2) % 2 == 1;
-        bool B = i % 2 == 1;
 
-        bool result = expression(A, B);
+        bool A = (var_count == 2) ? (i / 2) % 2 == 1 : (i / 4) % 2 == 1;
+        bool B = (var_count == 2) ? i % 2 == 1 : (i / 2) % 2 == 1;
+        bool C = (var_count == 2) ? unsigned{0} : i % 2 == 1;
+
+        bool result = (var_count == 2) ? expression(A, B, C) : expression(A, B, C);
         if (result == false)
         {
             is_tautology = false;
         }
         cout << "| " << print_bool(A);
-        if (var_count >= 2)
-            cout << " | " << print_bool(B);
-        cout << " |     " << print_bool(Implication(B, A));
+        cout << " | " << print_bool(B);
+        if (var_count == 3)
+        {
+            cout << " | " << print_bool(C);
+            cout << " |     " << print_bool(Implication(B, C));
+        }
+        else
+            cout << " |     " << print_bool(Implication(B, A));
         cout << "    |       " << print_bool(result) << endl;
     }
     cout << "=============================================\n";
@@ -52,15 +63,20 @@ void solveExpression(int var_count, const string expression_name, const function
         cout << "| " << expression_name << " IS a TAUTOLOGY.\n";
     else
         cout << "| " << expression_name << " IS NOT a TAUTOLOGY.\n";
-    cout << "=============================================";
+    cout << "=============================================\n\n";
 }
 
 void solve()
 {
     solveExpression(
+        3,
+        "A -> (B -> C)",
+        [](bool A, bool B, bool C)
+        { return Implication(A, Implication(B, C)); });
+    solveExpression(
         2,
         "A -> (B -> A)",
-        [](bool A, bool B)
+        [](bool A, bool B, unsigned)
         { return Implication(A, Implication(B, A)); });
 }
 
