@@ -1,0 +1,12 @@
+{
+    "cSpell.words": [
+        "Biconditional"
+    ],
+    "files.associations": {
+        "*.embeddedhtml": "html",
+        "iomanip": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "random": "cpp"
+    }
+}
