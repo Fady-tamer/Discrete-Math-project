@@ -32,7 +32,7 @@ void solveExpression(int var_count, const string expression_name, const function
     cout << "| A | B | (B -> A) | A -> (B -> A)\n";
     bool is_tautology = true;
     cout << "=============================================\n";
-    for (int i = 0; i < num_rows; ++i)
+    for (int i = num_rows - 1; i >= 0; i--)
     {
         bool A = (i / 2) % 2 == 1;
         bool B = i % 2 == 1;
