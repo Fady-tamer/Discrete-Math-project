@@ -4,9 +4,6 @@
 
 using namespace std;
 
-#define ll long long
-#define ld long double
-
 void fady_tamer()
 {
     cin.tie(nullptr)->sync_with_stdio(false);
@@ -20,139 +17,94 @@ bool Conjunction(bool p, bool q) { return p && q; }
 bool Disjunction(bool p, bool q) { return p || q; }
 bool Negation(bool p) { return !p; }
 bool Implication(bool p, bool q) { return Negation(p) || q; }
-// function to print 'T' for true and 'F' for false
+bool double_Implication(bool p, bool q) { return Implication(p, q) && Implication(q, p); }
 string print_bool(bool val) { return val ? "T" : "F"; }
-
-void solveExpression(int var_count, const string expression_name, const function<bool(bool, bool, bool)> expression)
+void get_truth_values(int i, int var_count, bool &P, bool &Q, bool &R)
 {
-    int num_rows = pow(2, var_count);
-    cout << "=============================================\n";
-    cout << "| Expression: " << expression_name << " is it TAUTOLOGY |" << "\n";
-    cout << "=============================================\n";
-    if (var_count == 2)
-        cout << "| A | B |  B -> A  | " << expression_name << " |\n";
-    else
-        cout << "| A | B | C |  B -> C  | " << expression_name << " |\n";
-    bool is_tautology = true;
-    cout << "=============================================\n";
-    for (int i = num_rows - 1; i >= 0; i--)
+    if (var_count == 3)
     {
-
-        bool A = (var_count == 2) ? (i / 2) % 2 == 1 : (i / 4) % 2 == 1;
-        bool B = (var_count == 2) ? i % 2 == 1 : (i / 2) % 2 == 1;
-        bool C = (var_count == 2) ? unsigned{0} : i % 2 == 1;
-
-        bool result = (var_count == 2) ? expression(A, B, C) : expression(A, B, C);
-        if (result == false)
-        {
-            is_tautology = false;
-        }
-        cout << "| " << print_bool(A);
-        cout << " | " << print_bool(B);
-        if (var_count == 3)
-        {
-            cout << " | " << print_bool(C);
-            cout << " |     " << print_bool(Implication(B, C));
-        }
-        else
-            cout << " |     " << print_bool(Implication(B, A));
-        cout << "    |       " << print_bool(result) << endl;
+        P = (i / 4) % 2 == 1;
+        Q = (i / 2) % 2 == 1;
+        R = i % 2 == 1;
     }
-    cout << "=============================================\n";
-    if (is_tautology)
-        cout << "| " << expression_name << " IS a TAUTOLOGY.\n";
+    else if (var_count == 2)
+    {
+        P = (i / 2) % 2 == 1;
+        Q = i % 2 == 1;
+        R = false;
+    }
     else
-        cout << "| " << expression_name << " IS NOT a TAUTOLOGY.\n";
-    cout << "=============================================\n\n";
+    {
+        P = i % 2 == 1;
+        Q = false;
+        R = false;
+    }
 }
-void compareExpressions(int var_count, const string LHS, const string RHS, const function<bool(bool, bool, bool)> expression, const function<bool(bool, bool, bool)> other_expression)
+
+void compareExpressions(int var_count, const string LHS_name, const string RHS_name, const function<bool(bool, bool, bool)> LHS_func, const function<bool(bool, bool, bool)> RHS_func)
 {
     int num_rows = pow(2, var_count);
-    cout << "=============================================\n";
-    cout << "| Expression: " << LHS << " (L.H.S) |" << "\n";
-    cout << "=============================================\n";
-    cout << "| A | B | " << LHS << " |\n";
-    cout << "=============================================\n";
+
+    cout << "==================================================================================\n";
+    cout << "| Checking Equivalence: " << LHS_name << " <=> " << RHS_name << "\n";
+    cout << "==================================================================================\n";
+    cout << "| " << "P" << " | " << "Q";
+    if (var_count == 3)
+        cout << " | " << "R";
+    cout << " | " << "LHS" << " | " << "RHS" << " | " << "Match" << " |\n";
+    cout << "==================================================================================\n";
 
     bool is_equivalence = true;
-    for (int i = num_rows - 1; i >= 0; i--)
+    for (int i = 0; i < num_rows; i++)
     {
-
-        bool A = (var_count == 2) ? (i / 2) % 2 == 1 : (i / 4) % 2 == 1;
-        bool B = (var_count == 2) ? i % 2 == 1 : (i / 2) % 2 == 1;
-        bool C = (var_count == 2) ? unsigned{0} : i % 2 == 1;
-
-        bool LHS = (var_count == 2) ? expression(A, B, C) : expression(A, B, C);
-        bool RHS = (var_count == 2) ? other_expression(A, B, C) : other_expression(A, B, C);
-        if (LHS != RHS)
+        bool P, Q, R;
+        get_truth_values(i, var_count, P, Q, R);
+        bool LHS_result = LHS_func(P, Q, R);
+        bool RHS_result = RHS_func(P, Q, R);
+        bool match = (LHS_result == RHS_result);
+        if (!match)
         {
             is_equivalence = false;
         }
-        cout << "| " << print_bool(A);
-        cout << " | " << print_bool(B);
-        cout << " |   " << print_bool(LHS) << endl;
+        cout << "| " << print_bool(P);
+        cout << " | " << print_bool(Q);
+        if (var_count == 3)
+            cout << " | " << print_bool(R);
+        cout << " |  " << print_bool(LHS_result);
+        cout << "  |  " << print_bool(RHS_result);
+        cout << "  |   " << (match ? "T" : "F") << "   |\n";
     }
 
-    cout << "=============================================\n";
-    cout << "| Expression: " << RHS << " (R.H.S) |" << "\n";
-    cout << "=============================================\n";
-    cout << "| A | B | " << RHS << " |\n";
-    cout << "=============================================\n";
-
-    for (int i = num_rows - 1; i >= 0; i--)
-    {
-
-        bool A = (var_count == 2) ? (i / 2) % 2 == 1 : (i / 4) % 2 == 1;
-        bool B = (var_count == 2) ? i % 2 == 1 : (i / 2) % 2 == 1;
-        bool C = (var_count == 2) ? unsigned{0} : i % 2 == 1;
-
-        bool LHS = (var_count == 2) ? expression(A, B, C) : expression(A, B, C);
-        bool RHS = (var_count == 2) ? other_expression(A, B, C) : other_expression(A, B, C);
-        if (LHS != RHS)
-        {
-            is_equivalence = false;
-        }
-        cout << "| " << print_bool(A);
-        cout << " | " << print_bool(B);
-        cout << " |   " << print_bool(RHS) << endl;
-    }
-
-    cout << "=============================================\n";
+    cout << "==================================================================================\n";
     if (is_equivalence)
-        cout << "| " << LHS << " and " << RHS << " is equivalence.\n";
+        cout << "| " << LHS_name << " and " << RHS_name << " ARE EQUIVALENT.|\n";
     else
-        cout << "| " << LHS << " and " << RHS << " is't equivalence.\n";
-    cout << "=============================================\n\n";
+        cout << "| " << LHS_name << " and " << RHS_name << " ARE NOT EQUIVALENT.|\n";
+    cout << "==================================================================================\n\n";
 }
 
 void solve()
 {
-    solveExpression(
+    auto LHS_logic = [](bool P, bool Q, bool R)
+    {
+        bool term1 = Conjunction(P, Negation(R));
+        bool term2_inner1 = Disjunction(P, Negation(Q));
+        bool term2_inner2 = Disjunction(Q, Negation(P));
+        bool term2 = Conjunction(term2_inner1, term2_inner2);
+        return Disjunction(term1, term2);
+    };
+
+    auto RHS_logic = [](bool P, bool Q, bool R)
+    {
+        bool term1 = Conjunction(P, Negation(R));
+        bool term2 = double_Implication(Q, P);
+        return Disjunction(term1, term2);
+    };
+    compareExpressions(
         3,
-        "A -> (B -> C)",
-        [](bool A, bool B, bool C)
-        { return Implication(A, Implication(B, C)); });
-    solveExpression(
-        2,
-        "A -> (B -> A)",
-        [](bool A, bool B, unsigned)
-        { return Implication(A, Implication(B, A)); });
-    compareExpressions(
-        2,
-        "A ^ B",
-        "B ^ A",
-        [](bool A, bool B, unsigned)
-        { return Conjunction(A, B); },
-        [](bool A, bool B, unsigned)
-        { return Conjunction(B, A); });
-    compareExpressions(
-        2,
-        "A ^ B",
-        "B -> A",
-        [](bool A, bool B, unsigned)
-        { return Conjunction(A, B); },
-        [](bool A, bool B, unsigned)
-        { return Implication(B, A); });
+        "(p ^ ~r) v (p v ~q) ^ (q v ~p)",
+        "(p ^ ~r) v (q <-> p)",
+        LHS_logic, RHS_logic);
 }
 
 signed main()
