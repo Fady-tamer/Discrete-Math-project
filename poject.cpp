@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void fady_tamer()
+void output()
 {
     cin.tie(nullptr)->sync_with_stdio(false);
 #ifndef ONLINE_JUDGE
@@ -17,7 +17,7 @@ bool Conjunction(bool p, bool q) { return p && q; }
 bool Disjunction(bool p, bool q) { return p || q; }
 bool Negation(bool p) { return !p; }
 bool Implication(bool p, bool q) { return Negation(p) || q; }
-bool double_Implication(bool p, bool q) { return Implication(p, q) && Implication(q, p); }
+bool Double_Implication(bool p, bool q) { return Implication(p, q) && Implication(q, p); }
 string print_bool(bool val) { return val ? "T" : "F"; }
 void get_truth_values(int i, int var_count, bool &P, bool &Q, bool &R)
 {
@@ -46,7 +46,7 @@ void compareExpressions(int var_count, const string LHS_name, const string RHS_n
     int num_rows = pow(2, var_count);
 
     cout << "==================================================================================\n";
-    cout << "| Checking Equivalence: " << LHS_name << " <=> " << RHS_name << "\n";
+    cout << "| Checking Equivalence: " << LHS_name << " = " << RHS_name << "\n";
     cout << "==================================================================================\n";
     cout << "| " << "P" << " | " << "Q";
     if (var_count == 3)
@@ -55,7 +55,7 @@ void compareExpressions(int var_count, const string LHS_name, const string RHS_n
     cout << "==================================================================================\n";
 
     bool is_equivalence = true;
-    for (int i = 0; i < num_rows; i++)
+    for (int i = num_rows - 1; i >= 0; i--)
     {
         bool P, Q, R;
         get_truth_values(i, var_count, P, Q, R);
@@ -83,38 +83,31 @@ void compareExpressions(int var_count, const string LHS_name, const string RHS_n
     cout << "==================================================================================\n\n";
 }
 
-void solve()
+int main()
 {
+    output();
     auto LHS_logic = [](bool P, bool Q, bool R)
     {
-        bool term1 = Conjunction(P, Negation(R));
-        bool term2_inner1 = Disjunction(P, Negation(Q));
-        bool term2_inner2 = Disjunction(Q, Negation(P));
-        bool term2 = Conjunction(term2_inner1, term2_inner2);
-        return Disjunction(term1, term2);
+        bool term1 = Conjunction(Negation(P), R); // (~ p ^ r)
+
+        bool term2_inner1 = Disjunction(P, Negation(Q));      // (p v ~ q)
+        bool term2_inner2 = Disjunction(Q, Negation(P));      // (q v ~ p)
+        bool term2 = Conjunction(term2_inner1, term2_inner2); // (p v ~ q) ^ (q v ~ p)  = A
+
+        return Disjunction(term1, term2); // (~ p ^ r) v A
     };
 
     auto RHS_logic = [](bool P, bool Q, bool R)
     {
-        bool term1 = Conjunction(P, Negation(R));
-        bool term2 = double_Implication(Q, P);
-        return Disjunction(term1, term2);
+        bool term1 = Conjunction(Negation(P), R); // (~ p ^ r)
+        bool term2 = Double_Implication(Q, P);    // (q <-> p)
+        return Disjunction(term1, term2);         // (~ p ^ r) v (q <-> p)
     };
     compareExpressions(
         3,
-        "(p ^ ~r) v (p v ~q) ^ (q v ~p)",
-        "(p ^ ~r) v (q <-> p)",
+        "(~ p ^ r) v (p v ~ q) ^ (q v ~ p)",
+        "(~ p ^ r) v (q <-> p)",
         LHS_logic, RHS_logic);
-}
 
-signed main()
-{
-    fady_tamer();
-    int tc = 1;
-    // cin >> tc;
-    for (int i = 1; i <= tc; i++)
-    {
-        solve();
-    }
     return 0;
 }
